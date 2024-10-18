@@ -1,7 +1,8 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits, REST, Routes } = require('discord.js');
-const { clientId, guildId, token } = require('./config.json');
+const dotenv = require('dotenv')
+dotenv.config()
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers,] });
 
@@ -40,7 +41,7 @@ for (const file of eventFiles) {
 }
 
 // Construct and prepare an instance of the REST module
-const rest = new REST().setToken(token);
+const rest = new REST().setToken(process.env.DISCORD_TOKEN);
 
 // and deploy your commands!
 (async () => {
@@ -49,7 +50,7 @@ const rest = new REST().setToken(token);
 
 		// The put method is used to fully refresh all commands in the guild with the current set
 		const data = await rest.put(
-			Routes.applicationCommands(clientId, guildId),
+			Routes.applicationCommands(process.env.DISCORD_CLIENT_ID, process.env.DISCORD_GUILD_ID),
 			{ body: commands },
 		);
 
@@ -60,4 +61,4 @@ const rest = new REST().setToken(token);
 	}
 })();
 
-client.login(token);
+client.login();
