@@ -6,6 +6,6 @@ module.exports = {
 		.setName('ping')
 		.setDescription('Répond avec pong!'),
 	async execute(interaction) {
-		await interaction.reply('Pong ! ||( Tg mathéo )||');
+		await interaction.reply('Pong ! ||( Tg Matéo )||');
 	},
 };

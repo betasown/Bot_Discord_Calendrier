@@ -8,6 +8,20 @@ const datesAreOnSameDay = (first, second) =>
 
 const dateOptions = { hour: 'numeric', minute: 'numeric' }
 
+const dateDiff = (before, after) => {
+    let diff = after - before
+    let diffH = Math.floor(diff / 3600000)
+    let diffM = Math.floor((diff % 3600000) / 60000)
+
+    let strH = function () { if (diffH > 1) return 'heures'; else return 'heure' }()
+    let strM = function () { if (diffM > 1) return 'minutes'; else return 'minute' }()
+
+    if (diffH && diffM) return `(${diffH} ${strH}, ${diffM} ${strM})`
+    else if (diffH) return `(${diffH} ${strH})`
+    else if (diffM) return `(${diffM} ${strM})`
+    else return ''
+}
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('edt')
@@ -25,17 +39,20 @@ module.exports = {
         if (!webEvents) return interaction.reply({ content: 'Impossible de récupérer les évènements !', ephemeral: true })
 
         // Récupérer les évènements du jour demandé
-        const events = Object.values(webEvents).filter(event => {
-            const eventDate = new Date(event.start)
+        let events = Object.values(webEvents).filter(event => {
+            let eventDate = new Date(event.start)
             return datesAreOnSameDay(eventDate, date)
         })
         if (!events.length) return interaction.reply({ content: `Aucun évènement trouvé pour le ${date.toLocaleDateString('fr-FR')} !` })
+
+        // Trier les évènements par date de début
+        events = events.sort((a, b) => { return new Date(a.start) - new Date(b.start) })
 
         // Générer des parties de l'embed avec chaque évènement
         let fields = []
         events.forEach(event => fields = fields.concat({
             name: event.summary,
-            value: `De ${event.start.toLocaleTimeString('fr-FR', dateOptions)} à ${event.end.toLocaleTimeString('fr-FR', dateOptions)}` +
+            value: `De ${event.start.toLocaleTimeString('fr-FR', dateOptions)} à ${event.end.toLocaleTimeString('fr-FR', dateOptions)} ${dateDiff(event.start, event.end)}` +
                 function () { if (event.location) return ` | Salle ${event.location}`; else return '' }()
         }))
 
