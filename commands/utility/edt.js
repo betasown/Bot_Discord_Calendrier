@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js')
+const { SlashCommandBuilder, EmbedBuilder, SlashCommandSubcommandGroupBuilder } = require('discord.js')
 const ical = require('node-ical')
 
 const datesAreOnSameDay = (first, second) =>
@@ -11,17 +11,32 @@ const dateOptions = { hour: '2-digit', minute: '2-digit' }
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('edt')
-        .setDescription('Affiche les événements du jour depuis Google Calendar'),
+        .setDescription('Affiche les événements du jour depuis le calendrier sur Teams')
+        .addStringOption(option=>
+            option.setName("date")
+                .setDescription("format requis : aaaa-mm-jj")
+        ),
     async execute(interaction) {
-        const webEvents = await ical.async.fromURL('https://outlook.office365.com/owa/calendar/2321713d4b3642bbbeb7c5254b7ea057@cesi.fr/96e7a946f8414ef78608a28997c228463714143147821466256/S-1-8-179141276-3804106660-3851968801-3084725192/reachcalendar.ics');
+        const dateOption = interaction.options.getString('date');
+        let date = new Date();
+
+        if (dateOption) {
+            console.log(dateOption)
+            console.log(Date.parse(dateOption))
+            date = new Date(Date.parse(dateOption));
+        }
+        console.log(date)
+
+        const calendarUrl = 'https://outlook.office365.com/owa/calendar/2321713d4b3642bbbeb7c5254b7ea057@cesi.fr/96e7a946f8414ef78608a28997c228463714143147821466256/S-1-8-179141276-3804106660-3851968801-3084725192/reachcalendar.ics'
+        const webEvents = await ical.async.fromURL(calendarUrl)
         if (!webEvents) return interaction.reply({ content: 'Impossible de récupérer les événements !', ephemeral: true })
 
-        // Get the data from today
-        const today = new Date()
         const events = Object.values(webEvents).filter(event => {
             const eventDate = new Date(event.start)
-            return datesAreOnSameDay(eventDate, today)
+            return datesAreOnSameDay(eventDate, date)
         })
+
+        if (!events) interaction.reply({ content: 'Aucun évènement trouvé !' })
 
         let fields = []
         events.forEach(event => fields = fields.concat({
