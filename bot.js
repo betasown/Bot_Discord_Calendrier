@@ -4,7 +4,14 @@ const { Client, Collection, Events, GatewayIntentBits, REST, Routes } = require(
 const dotenv = require('dotenv')
 dotenv.config()
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers,] });
+const client = new Client({ 
+    intents: [
+        GatewayIntentBits.Guilds, 
+        GatewayIntentBits.GuildMembers, 
+        GatewayIntentBits.GuildMessages, 
+        GatewayIntentBits.MessageContent
+    ] 
+});
 
 client.cooldowns = new Collection();
 client.commands = new Collection();
