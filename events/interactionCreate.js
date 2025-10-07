@@ -27,7 +27,7 @@ module.exports = {
 
             if (now < expirationTime) {
                 const expiredTimestamp = Math.round(expirationTime / 1000);
-                return interaction.reply({ content: `Deux petite secondes, j'ai besoin de me recharger pour refaire : \`${command.data.name}\`. Je suis prêt dans <t:${expiredTimestamp}:R>.`, ephemeral: true });
+                return interaction.reply({ content: `Deux petite secondes, j'ai besoin de me recharger pour refaire : \`${command.data.name}\`. Je suis prêt dans <t:${expiredTimestamp}:R>.`, flags: 64 });
             }
         }
 
@@ -39,9 +39,9 @@ module.exports = {
         } catch (error) {
             console.error(error);
             if (interaction.replied || interaction.deferred) {
-                await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+                await interaction.followUp({ content: 'There was an error while executing this command!', flags: 64 });
             } else {
-                await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+                await interaction.reply({ content: 'There was an error while executing this command!', flags: 64 });
             }
         }
 	},
